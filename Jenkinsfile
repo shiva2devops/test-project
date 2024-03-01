@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker { image 'maven:latest'}
-    }
-    tools {
-        Maven 'maven'
-    }
+    agent none
 
     stages {
         stage("checkout"){
@@ -13,10 +8,17 @@ pipeline {
             }
 
         }
+        stage("Maven install"){
+            agent{
+                docker {
+                    image 'maven:latest'
+                }
+            }
+        }
         stage("build"){
             steps {
                  echo "----------- build started ----------"
-                sh 'mvn clean deploy -Dmaven.test.skip=true'
+                sh 'mvn clean install'
                  echo "----------- build complted ----------"
             }
         }
