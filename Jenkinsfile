@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     docker build -t ${DOCKER_IMAGE} .
-                    
+
                 }
             }
         }
@@ -45,12 +45,12 @@ pipeline {
         // }
     }
     
-    post {
-        success {
-            echo 'Build and test succeeded. Docker image pushed to registry.'
-        }
-        failure {
-            echo 'Build or test failed. Docker image was not pushed to registry.'
-        }
-    }
+    // post {
+    //     success {
+    //         echo 'Build and test succeeded. Docker image pushed to registry.'
+    //     }
+    //     failure {
+    //         echo 'Build or test failed. Docker image was not pushed to registry.'
+    //     }
+    // }
 }
