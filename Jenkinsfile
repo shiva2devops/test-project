@@ -1,7 +1,7 @@
 
 pipeline {
     environment { 
-        registry = "mshiva7396/test-project" 
+        DOCKER_IMAGE = "mshiva7396/test-project:${BUILD_NUMBER}" 
         registryCredential = 'docker-creds' 
         dockerImage = '' 
     }
@@ -34,7 +34,7 @@ pipeline {
             steps {
                 echo 'Building Docker Image'
                 script {
-                   dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                   dockerImage = docker.build(DOCKER_IMAGE)
                 }
             }
         }
@@ -44,7 +44,7 @@ pipeline {
                 echo 'Pushing Docker Image'
                 script {
                     docker.withRegistry('', registryCredential) {
-                        dockerImage.push(${BUILD_NUMBER})
+                        dockerImage.push()
                     }
                 }
             }
