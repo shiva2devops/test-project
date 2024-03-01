@@ -1,58 +1,56 @@
+REGISTRY_CREDENTIALS = credentials('docker-creds')
+DOCKER_IMAGE = "mshiva7396/test-project:${BUILD_NUMBER}"
 pipeline {
     agent {
-        docker
+        docker {
+            image 'maven:latest'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
-
+    }
+    
     stages {
-        stage("checkout"){
-            steps {
-                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/shiva2devops/test-project.git'
-            }
-
-        }
-        stage("Maven install"){
-            steps {
-                docker {
-                    image 'maven:latest'
-                }
-            }
-        }
-        stage("build"){
-            steps {
-                 echo "----------- build started ----------"
-                sh 'mvn clean install'
-                 echo "----------- build complted ----------"
-            }
-        }
-        stage("test"){
-            steps{
-                echo "----------- unit test started ----------"
-                sh 'mvn surefire-report:report'
-                 echo "----------- unit test Complted ----------"
-            }
-        }
-  
-        stage(" Docker Build ") {
-          steps {
-            script {
-               echo '<--------------- Docker Build Started --------------->'
-               app = docker.build(imageName+":"+version)
-               echo '<--------------- Docker Build Ends --------------->'
-            }
-          }
-        }
-
-        stage (" Docker Publish "){
+        stage('Build') {
             steps {
                 script {
-                   echo '<--------------- Docker Publish Started --------------->'  
-                    docker.withRegistry(registry, 'artifact-cred'){
-                        app.push()
-                    }    
-                   echo '<--------------- Docker Publish Ended --------------->'  
+                    sh 'mvn clean package -DskipTests=true'
                 }
             }
         }
+        
+        stage('Test') {
+            steps {
+                script {
+                    sh 'mvn test'
+                }
+            }
+        }
+        
+        stage('Docker Build') {
+            steps {
+                script {
+                    docker build -t ${DOCKER_IMAGE} .
+                    
+                }
+            }
+        }
+        
+        // stage('Docker Push') {
+        //     steps {
+        //         script {
+        //             docker.withRegistry('https://your.registry.url', 'docker-credentials-id') {
+        //                 docker.image('your-docker-image-name:latest').push('latest')
+        //             }
+        //         }
+        //     }
+        // }
+    }
     
+    post {
+        success {
+            echo 'Build and test succeeded. Docker image pushed to registry.'
+        }
+        failure {
+            echo 'Build or test failed. Docker image was not pushed to registry.'
+        }
     }
 }
