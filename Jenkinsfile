@@ -39,15 +39,21 @@ pipeline {
             }
         }
         
-        // stage('Docker Push') {
-        //     steps {
-        //         script {
-        //             docker.withRegistry('https://your.registry.url', 'docker-credentials-id') {
-        //                 docker.image('your-docker-image-name:latest').push('latest')
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Docker Push') {
+            steps {
+                echo 'Pushing Docker Image'
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        dockerImage.push(${BUILD_NUMBER})
+                    }
+                }
+            }
+        }
+         stage('clean up'){
+            steps{
+                sh 'docker rmi $registry:$BUILD_NUMBER'
+            }
+         }
     }
     
     // post {
