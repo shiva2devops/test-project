@@ -1,5 +1,7 @@
 pipeline {
-    agent none
+    agent {
+        docker { image 'maven:latest'}
+    }
 
     stages {
         stage("checkout"){
