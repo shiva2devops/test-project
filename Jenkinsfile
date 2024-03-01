@@ -1,5 +1,7 @@
 pipeline {
-    agent none
+    agent {
+        docker
+        }
 
     stages {
         stage("checkout"){
@@ -9,7 +11,7 @@ pipeline {
 
         }
         stage("Maven install"){
-            agent{
+            steps {
                 docker {
                     image 'maven:latest'
                 }
