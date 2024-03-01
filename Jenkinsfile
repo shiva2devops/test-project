@@ -1,6 +1,10 @@
-REGISTRY_CREDENTIALS = credentials('docker-creds')
-DOCKER_IMAGE = "mshiva7396/test-project:${BUILD_NUMBER}"
+
 pipeline {
+    environment { 
+        registry = "mshiva7396/test-project" 
+        registryCredential = 'docker-creds' 
+        dockerImage = '' 
+    }
     agent {
         docker {
             image 'maven:latest'
@@ -28,8 +32,9 @@ pipeline {
         
         stage('Docker Build') {
             steps {
+                echo 'Building Docker Image'
                 script {
-                   sh 'docker build -t ${DOCKER_IMAGE} .'
+                   dockerImage = docker.build registry + ":$BUILD_NUMBER"
                 }
             }
         }
